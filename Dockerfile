@@ -17,24 +17,27 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 	maintainer="Riftbit ErgoZ"
 
 RUN apk update && apk upgrade && \
-    apk add --no-cache --update openjdk8-jre curl unzip && \
-    mkdir -p /blynk/data && \
-    mkdir /blynk/config && \
-    mkdir /logs && \
-    touch /logs/server.log && \
-    touch /logs/blynk.log && \
-    touch /logs/worker.log && \
-		curl -L https://github.com/blynkkk/blynk-server/releases/download/v${VERSION}/server-${VERSION}-java8.jar > /blynk/server.jar && \
-		curl -L https://github.com/blynkkk/blynk-server/archive/v${VERSION}.zip > /tmp/server.zip && \
-    unzip /tmp/server.zip && \
-		mv /blynk-server-${VERSION}/server/core/src/main/resources/server.properties /blynk/config/server.properties && \
-    apk del --purge curl unzip && \
-		rm -rf /blynk-server-${VERSION} && \
-    rm -rf /var/cache/apk/*
+	apk add --no-cache --update openjdk8-jre curl unzip && \
+	mkdir -p /blynk/data && \
+	mkdir /blynk/config && \
+	mkdir /logs && \
+	touch /logs/server.log && \
+	touch /logs/blynk.log && \
+	touch /logs/worker.log && \
+	curl -L https://github.com/blynkkk/blynk-server/releases/download/v${VERSION}/server-${VERSION}-java8.jar > /blynk/server.jar && \
+	curl -L https://github.com/blynkkk/blynk-server/archive/v${VERSION}.zip > /tmp/server.zip && \
+	unzip /tmp/server.zip && \
+	mv /blynk-server-${VERSION}/server/core/src/main/resources/server.properties /blynk/config/server.properties && \
+	apk del --purge curl unzip && \
+	rm -rf /blynk-server-${VERSION} && \
+	rm -rf /var/cache/apk/*
 
 VOLUME ["/blynk/config", "/blynk/data"]
 
 EXPOSE 7443/tcp 8080/tcp 8081/tcp 8082/tcp 8440/tcp 8441/tcp 8442/tcp 8443/tcp 9443/tcp
 
-CMD java -jar /blynk/server.jar -dataFolder /blynk/data -serverConfig /blynk/config/server.properties > /logs/server.log & \
-    tail -f /logs/server.log /logs/blynk.log /logs/worker.log
+CMD java -jar /blynk/server.jar \
+	-dataFolder /blynk/data \
+	-serverConfig /blynk/config/server.properties \
+	-mailConfig /blynk/config/mail.properties > /logs/server.log & \
+	tail -f /logs/server.log /logs/blynk.log /logs/worker.log
